@@ -1,43 +1,104 @@
-#include <iostream>
-#include <string>
-using namespace std;
-
 class Enemy {
 protected:
     string name;
     int health;
-    int attack;
+    int damage;
 
 public:
-    // Constructor
-    Enemy(string n, int h, int a) : name(n), health(h), attack(a) {}
+    Enemy(string n, int h, int d)
+        : name(n), health(h), damage(d) {}
 
-    // Virtual destructor (important for inheritance!)
     virtual ~Enemy() {}
 
-    // Basic attack behavior
-    virtual void attackPlayer() {
-        cout << name << " attacks for " << attack << " damage!\n";
+    string getName() const {
+        return name;
     }
 
-    // Virtual special ability (default = none)
-    virtual void specialAbility() {
-        cout << name << " has no special ability.\n";
+    int getHealth() const {
+        return health;
     }
 
-    // Take damage
-    void takeDamage(int dmg) {
-        health -= dmg;
-        cout << name << " takes " << dmg << " damage!\n";
-    }
-
-    // Check if alive
     bool isAlive() const {
         return health > 0;
     }
 
-    // Getter
-    string getName() const {
-        return name;
+    void takeDamage(int dmg) {
+        health -= dmg;
+        if (health < 0) health = 0;
+    }
+
+    int getDamage() const {
+        return damage;
+    }
+};
+
+
+#include <cstdlib>
+#include <iostream>
+using namespace std;
+
+class Stalker : public Enemy {
+private:
+    string hiddenSide;
+
+public:
+    Stalker() : Enemy("Stalker", 40, 7) {
+        hiddenSide = (rand() % 2 == 0) ? "left" : "right";
+    }
+
+    void encounter(Character &player) {
+
+        cout << "\nYou feel something watching you...\n";
+        cout << "Look left or right: ";
+
+        string guess;
+        cin >> guess;
+
+        // ❌ Wrong guess = immediate punishment
+        if (guess != hiddenSide) {
+            cout << "Wrong direction! The Stalker strikes!\n";
+            player.damage(damage);
+            return;
+        }
+
+        cout << "You found the Stalker! Combat begins!\n";
+
+        // ⚔️ Combat loop
+        while (isAlive() && player.gethealth() > 0) {
+
+            string action;
+            cout << "\nType 'attack': ";
+            cin >> action;
+
+            if (action == "attack") {
+
+                int roll = rand() % 100; // 0–99
+
+                // 70% hit chance
+                if (roll < 70) {
+                    int playerDamage = player.total_damage_power();
+
+                    cout << "You hit the Stalker for " 
+                         << playerDamage << " damage!\n";
+
+                    takeDamage(playerDamage);
+
+                    if (!isAlive()) {
+                        cout << "\nCongrats! You beat the Stalker!\n";
+                        return;
+                    }
+
+                }
+                //30% miss chance → Stalker attacks
+                else {
+                    cout << "You missed! The Stalker counterattacks!\n";
+                    player.damage(damage);
+                }
+
+            } else {
+                cout << "You hesitate... The Stalker attacks!\n";
+                player.damage(damage);
+            }
+        }
     }
 };
