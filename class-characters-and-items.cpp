@@ -1,3 +1,4 @@
+
 #include <iostream>
 #include <vector>
 using namespace std;
@@ -137,7 +138,9 @@ public:
     Jess() : Character("Jess", 100, 3.2) {}
 
     void intro() override{
-        cout << "Jess: balanced fighter.\n";
+        cout << "Jess; the balanced fighter. You are well-built, a fighter equal in strenght and smarts.\n";
+        cout << "You are the most resilient of the group, but does that mean you'll be the one to make it out?\n";
+
     }
 };
 
@@ -146,7 +149,9 @@ public:
     Bob() : Character("Bob ", 60, 7.7) {}
 
     void intro() override{
-        cout << "Bob: glass cannon.\n";
+        cout << "Bob, a man of great power. You have immense power, power not to be trifled with.\n";
+        cout << "It will be difficult to strike you down. Are you strong enough to stay stand though?\n";
+
     }
 };
 
@@ -155,7 +160,10 @@ public:
     Donut() : Character("Donut (the cat)", 5, 154.2) {}
 
     void intro() override{
-        cout << "Donut: chaos entity.\n";
+        cout << "Donut. You are Donut. Donut the cat.\n";
+        cout << "You are weak in health. On the last of your nine lives.\n";
+        cout << "But your power is other-worldly. Unmatched...\n";
+        cout << "But, for as much power as you hold, your extreme weakness keeps you always on deaths door.\n";
     }
 };
 
