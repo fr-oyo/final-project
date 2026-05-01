@@ -1,88 +1,72 @@
+
 #include <iostream>
-#include <iomanip>
 #include <vector>
 using namespace std;
 
-
+// ================= ITEM =================
 class Item {
 public:
     string name;
     int effect;
-    string type; // "heal" or "damage"
+    string type; // heal, damage, info
 
-    Item(string n, int e, string t) : name(n), effect(e), type(t) {}
+    Item(string n, int e, string t)
+        : name(n), effect(e), type(t) {}
 };
 
+// ================= BASE CHARACTER =================
+class Character {
 
-class Character{ //this is the class defined
-  
+protected:
+    string Name;
+    int Max_Health {0};
+    int Current_Health {0};
+    double Power_multipler {0.0};
 
-    private: //the private members that are read only
-        string Name;
-        int Health_Number {0};
-        double Power_multipler {0.0};
-        vector<Item> inventory; 
+    vector<Item> inventory;
 
-        static int Character_alive;
+    static int Character_alive;
 
-    public:
-        Character(){ // this increments the count on objects by one every time an Character is established in main
-            Character_alive++;
-        };
-        Character(const string& name, int health, double Power){ //this is a constructor, called by the class when an object is created, this is where to set defaults
-            Name = name;
-            Health_Number = health;
-            Power_multipler = Power;
-            Character_alive++;
-        };
+public:
+    Character(){
+        Character_alive++;
+    }
 
+    Character(string name, int maxHealth, double power){
+        Name = name;
+        Max_Health = maxHealth;
+        Current_Health = maxHealth;
+        Power_multipler = power;
+        Character_alive++;
+    }
 
+    virtual ~Character(){
+        Character_alive--;
+    }
 
-~Character(){ //deconstructor that decreases the count by 1
-    Character_alive--;
-}
+    virtual void intro(){
+        cout << "I am " << Name << endl;
+    }
 
-string getName() const{ // this is an observer, or a 'getter' which reads private data safely
-    return Name;
-}
+    string getName() const { return Name; }
+    int gethealth() const { return Current_Health; }
+    int getMaxHealth() const { return Max_Health; }
+    double getPower() const { return Power_multipler; }
 
-int gethealth() const{ 
-    return Health_Number;
-}
+    static int Still_alive(){
+        return Character_alive;
+    }
 
-double getPower() const{
-    return Power_multipler;
-}
-
-double total_damage_power() const{
-    return (Health_Number * Power_multipler);
-}
-
-static int Still_alive(){
-    return Character_alive;
-}
-
-void sethealth (int health){  //checks the constraints of health being above -1
-    if ( health >= 0)
-    Health_Number = health;
-    else Health_Number = 0;
-}
-
-void setPower(double Power){ //checks the constraints of Power being above -1
-    if(Power >= 0) {
-        Power_multipler = Power;}
-    else Power_multipler = 0;
-}
-
- void addItem(const Item& item){
+    // ================= INVENTORY =================
+    void addItem(const Item& item){
         inventory.push_back(item);
     }
 
-    void showInventory() const {
-        cout << Name << "'s Inventory:\n";
+    void showInventory() const{
+        cout << "\n" << Name << "'s Inventory:\n";
 
         if (inventory.empty()){
-            cout << "  Empty\n";
+            cout << "Empty\n";
             return;
         }
 
@@ -93,202 +77,191 @@ void setPower(double Power){ //checks the constraints of Power being above -1
         }
     }
 
-void printInventory() const{
-    cout << Name << "'s Inventory: ";
-    
-    if (inventory.empty()){
-        cout << "Empty";
-    } else {
-        for (const auto& item : inventory){
-            cout << item.name << " ";
+    // ================= ITEM USE =================
+    void useItem(int index){
+        if (index < 0 || index >= inventory.size()){
+            cout << "Invalid item index.\n";
+            return;
         }
-    }
-    cout << endl;
-}
 
-bool Heal(int amount){ // a function to call to ensure that when trying to Heal, you are paassing in a positive value
-    if (amount > 0)
-    {
-        Health_Number += amount;
-        return true;
-    }
-    else
-    cout << "YOU'VE BEEN HEALED. +" << amount << " has been added to your health. Health is " << Health_Number << endl;
-    return false;
-}
+        Item item = inventory[index];
 
-bool damage(int amount){ // a function to call to ensure that when trying to damage, you are paassing in a value greater than 0 but smaller than the amount of items you currently have
-    if (amount > 0 && amount < Health_Number){
-        Health_Number -= amount;
-        return true;
-    }
-    cout << "YOU HAVE DIED." << endl;
-    return false;
-}
+        cout << "Using " << item.name << "...\n";
 
+        if (item.type == "heal"){
+            gainHealth(item.effect);
+        }
+        else if (item.type == "damage"){
+            takeDamage(item.effect);
+        }
+        else {
+            cout << "Nothing happens...\n";
+        }
+
+        inventory.erase(inventory.begin() + index);
+    }
+
+    // ================= COMBAT =================
+    void takeDamage(int amount){
+        Current_Health -= amount;
+
+        if (Current_Health < 0)
+            Current_Health = 0;
+
+        cout << Name << " takes " << amount
+             << " damage. HP: " << Current_Health
+             << "/" << Max_Health << endl;
+    }
+
+    void gainHealth(int amount){
+        if (amount <= 0){
+            cout << "Invalid heal amount.\n";
+            return;
+        }
+
+        Current_Health += amount;
+
+        if (Current_Health > Max_Health)
+            Current_Health = Max_Health;
+
+        cout << Name << " healed. HP: "
+             << Current_Health << "/"
+             << Max_Health << endl;
+    }
 };
 
-void print(){ //print function for errors
+int Character::Character_alive = 0;
 
-    cout << "you entered an invalid input. Try again" << endl;
-    
-}
+// ================= SUBCLASSES =================
+class Jess : public Character {
+public:
+    Jess() : Character("Jess", 100, 3.2) {}
 
-void printing(const Character& player_one, const Character& player_two, const Character& player_three){
+    void intro() override{
+        cout << "Jess; the balanced fighter. You are well-built, a fighter equal in strenght and smarts.\n";
+        cout << "You are the most resilient of the group, but does that mean you'll be the one to make it out?\n";
 
-    cout << "Name: " << player_one.getName() << endl;
-    cout << "health: " << player_one.gethealth() << endl;
-    cout << "Power: " << player_one.getPower()  << endl;
-    cout << "Total damage power (when full health): " << player_one.total_damage_power() << endl;
-    player_one.printInventory();
-    cout << endl;
+    }
+};
 
-    cout << "Name: " << player_two.getName() << endl;
-    cout << "health: " << player_two.gethealth() << endl;
-    cout << "Power: " << player_two.getPower() << endl;
-    cout << "Total damage power (when full health): " << player_two.total_damage_power() << endl;
-    player_two.printInventory();
-    cout << endl;
+class Bob : public Character {
+public:
+    Bob() : Character("Bob ", 60, 7.7) {}
 
-    cout << "Name: " << player_three.getName() << endl;
-    cout << "health: " << player_three.gethealth() << endl;
-    cout << "Power: " << player_three.getPower() << endl;
-    cout << "Total damage power (when full health): " << player_three.total_damage_power() << endl;
-    player_three.printInventory();
-    cout << endl;
+    void intro() override{
+        cout << "Bob, a man of great power. You have immense power, power not to be trifled with.\n";
+        cout << "It will be difficult to strike you down. Are you strong enough to stay stand though?\n";
 
-    //cout << "The final object count is: " << Character_alive << endl;
-}
+    }
+};
 
-int Character::Character_alive = 0; // since this is a static data type, you need to have a memory location so this is establishing one
+class Donut : public Character {
+public:
+    Donut() : Character("Donut (the cat)", 5, 154.2) {}
 
+    void intro() override{
+        cout << "Donut. You are Donut. Donut the cat.\n";
+        cout << "You are weak in health. On the last of your nine lives.\n";
+        cout << "But your power is other-worldly. Unmatched...\n";
+        cout << "But, for as much power as you hold, your extreme weakness keeps you always on deaths door.\n";
+    }
+};
+
+// ================= MAIN =================
 int main(){
 
-    string answer;
-    string itemname;
-    string choice;
-    int number;
-    
-   // cout <<"Objects created brefore establishing any in main: " << Character::Still_alive() << endl;
-
-    Character player_one ("Jess", 100, 3.2); //creating object
-    Character player_two ("Bob", 60, 5.7);
-    Character player_three ("Donut", 5, 154.2);
-
+    // ITEMS
     Item potion("Potion", 25, "heal");
-    Item hot_potato("Extremely hot potato", 40, "damage");
-    Item ring_of_sight("Ring of Sight", 0, "Information");
+    Item hot_potato("Hot Potato", 40, "damage");
+    Item ring("Ring of Sight", 0, "info");
 
+    // CHARACTER SELECTION
+    Character* player = nullptr;
 
-    // Give items
-    player_one.addItem(potion);
-    player_two.addItem(potion);
-    player_one.addItem(hot_potato);
+    cout << "Choose character:\n";
+    cout << "1. Jess\n";
+    cout << "2. Bob\n";
+    cout << "3. Donut\n";
+    cout << "Choice: ";
 
+    int choice;
+    cin >> choice;
 
-    cout << "Players available: '" <<  Character::Still_alive() << endl << endl;
+    if (choice == 1) player = new Jess();
+    else if (choice == 2) player = new Bob();
+    else if (choice == 3) player = new Donut();
+    else {
+        cout << "Invalid choice.\n";
+        return 0;
+    }
 
-    cout << "Current stats: " << endl << endl;
-    printing( player_one, player_two, player_three);
-    
+    player->intro();
 
+    cout << "\nYou enter a dark dungeon...\n";
 
-
-
+    // ================= GAME LOOP =================
     while (true){
 
-        cout << "\n===== MENU =====\n";
+        cout << "\n===== " << player->getName() << " MENU =====\n";
+        cout << "HP: " << player->gethealth()
+             << "/" << player->getMaxHealth() << endl;
+
         cout << "1. View Stats\n";
-        cout << "2. Add Item to Player\n";
-        cout << "3. View Inventory\n";
-        cout << "4. Quit\n";
+        cout << "2. View Inventory\n";
+        cout << "3. Use Item\n";
+        cout << "4. Add Potion\n";
+        cout << "5. Add Hot Potato\n";
+        cout << "6. Quit\n";
+        //cout << "7. Quit\n";
         cout << "Choice: ";
 
-        int choice;
-        cin >> choice;
+        int action;
+        cin >> action;
 
-        cout << endl;
-
-        if (choice == 4){
+        if (action == 6){
             cout << "Exiting game...\n";
             break;
         }
 
-        // ================= VIEW STATS =================
-        if (choice == 1){
-            printing(player_one, player_two, player_three);
+        else if (action == 1){
+            cout << "\nName: " << player->getName() << endl;
+            cout << "Health: " << player->gethealth()
+                 << "/" << player->getMaxHealth() << endl;
+            cout << "Power: " << player->getPower() << endl;
         }
 
-        // ================= ADD ITEM =================
-        else if (choice == 2){
-
-            cout << "\nSelect player:\n";
-            cout << "1. Jess\n";
-            cout << "2. Bob\n";
-            cout << "3. Donut the cat\n";
-            cout << "Choice: ";
-
-            int playerChoice;
-            cin >> playerChoice;
-
-            cout << "\nSelect item:\n";
-            cout << "1. Potion\n";
-            cout << "2. Hot Potato\n";
-            cout << "3. Ring of Sight\n";
-            cout << "Choice: " << endl;
-
-            int itemChoice;
-            cin >> itemChoice;
-
-            Character* selectedPlayer = nullptr;
-            Item* selectedItem = nullptr;
-
-            // pick player
-            if (playerChoice == 1) selectedPlayer = &player_one;
-            else if (playerChoice == 2) selectedPlayer = &player_two;
-            else if (playerChoice == 3) selectedPlayer = &player_three;
-            else {
-                cout << "Invalid player.\n";
-                continue;
-            }
-
-            // pick item
-            if (itemChoice == 1) selectedItem = &potion;
-            else if (itemChoice == 2) selectedItem = &hot_potato;
-            else if (itemChoice == 3) selectedItem = &ring_of_sight;
-            else {
-                cout << "Invalid item.\n";
-                continue;
-            }
-
-            selectedPlayer->addItem(*selectedItem);
-
-            cout << "Added " << selectedItem->name
-                 << " to " << selectedPlayer->getName() << endl;
+        else if (action == 2){
+            player->showInventory();
         }
 
-        // ================= VIEW INVENTORY =================
-        else if (choice == 3){
-
-            cout << "\nSelect player:\n";
-            cout << "1. Jess\n";
-            cout << "2. Bob\n";
-            cout << "3. Donut the cat\n";
-            cout << "Choice: " << endl;
-
-            int playerChoice;
-            cin >> playerChoice;
-
-            if (playerChoice == 1) player_one.showInventory();
-            else if (playerChoice == 2) player_two.showInventory();
-            else if (playerChoice == 3) player_three.showInventory();
-            else cout << "Invalid player.\n";
+        else if (action == 3){
+            player->showInventory();
+            cout << "\nEnter item index: ";
+            int index;
+            cin >> index;
+            player->useItem(index);
         }
 
+        else if (action == 4){
+            player->addItem(potion);
+            cout << "Potion added!\n";
+        }
+
+        else if (action == 5){
+            player->addItem(hot_potato);
+            cout << "Hot Potato added!\n";
+        }
+
+       
         else {
-            cout << "Invalid menu choice.\n";
+            cout << "Invalid option.\n";
         }
     }
+
+    delete player;
+
+    cout << "\nCharacters alive: "
+         << Character::Still_alive() << endl;
 
     return 0;
 }
