@@ -95,3 +95,23 @@ char Room::getSymbol() const{
             return '?';
     }
 }
+
+void Room::setType(RoomType type){
+    this->type = type;
+}
+void Room::setVisited(bool visited){
+    this->visited = visited;
+}
+
+void Room::setUp(bool x){
+    up = x;
+}
+void Room::setDown(bool x){
+    down = x;
+}
+void Room::setLeft(bool x){
+    left = x;
+}
+void Room::setRight(bool x){
+    right = x;
+}
