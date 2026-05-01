@@ -2,13 +2,12 @@
 #include <iostream>
 #include <vector>
 using namespace std;
-
 // ================= ITEM =================
 class Item {
 public:
     string name;
     int effect;
-    string type; // heal, damage, info
+    string type;
 
     Item(string n, int e, string t)
         : name(n), effect(e), type(t) {}
@@ -135,7 +134,7 @@ int Character::Character_alive = 0;
 // ================= SUBCLASSES =================
 class Jess : public Character {
 public:
-    Jess() : Character("Jess", 100, 3.2) {}
+    Jess() : Character("Jess", 100, 0.17) {}
 
     void intro() override{
         cout << "Jess; the balanced fighter. You are well-built, a fighter equal in strenght and smarts.\n";
@@ -146,7 +145,7 @@ public:
 
 class Bob : public Character {
 public:
-    Bob() : Character("Bob ", 60, 7.7) {}
+    Bob() : Character("Bob", 80, 0.23) {}
 
     void intro() override{
         cout << "Bob, a man of great power. You have immense power, power not to be trifled with.\n";
@@ -157,13 +156,38 @@ public:
 
 class Donut : public Character {
 public:
-    Donut() : Character("Donut (the cat)", 5, 154.2) {}
+    Donut() : Character("Donut", 40, 0.7) {}
 
     void intro() override{
         cout << "Donut. You are Donut. Donut the cat.\n";
         cout << "You are weak in health. On the last of your nine lives.\n";
         cout << "But your power is other-worldly. Unmatched...\n";
         cout << "But, for as much power as you hold, your extreme weakness keeps you always on deaths door.\n";
+    }
+};
+
+class Jena : public Character {
+public:
+    Jena() : Character("Jena",55, 0.2) {}
+
+    void intro() override{
+        cout << "You are Jena.\n";
+        cout << "Jena, while slightly weak in health holds steady against most opponents.\n";
+        cout << "You're also very good-looking...but thats irrelevant.\n";
+        cout << "If good at decision making, this should be a breeze...\n";
+        cout << "Or, maybe not...\n";
+    }
+};
+
+class Rylee : public Character {
+public:
+    Rylee() : Character("Rylee", 200, 0.01) {}
+
+    void intro() override{
+        cout << "People know you as Rylee.\n";
+        cout << "Dear god you're weak. Like, really weak.\n";
+        cout << "You have the best health, it'll take a thousand hits to take you down...\n";
+        cout << "But, you are so so weak, people laugh at you, you're so weak...\n";
     }
 };
 
@@ -178,10 +202,12 @@ int main(){
     // CHARACTER SELECTION
     Character* player = nullptr;
 
-    cout << "Choose character:\n";
+    cout << "Choose character (type the number):\n";
     cout << "1. Jess\n";
     cout << "2. Bob\n";
     cout << "3. Donut\n";
+    cout << "4. Jena\n";
+    cout << "5. Rylee\n";
     cout << "Choice: ";
 
     int choice;
@@ -190,6 +216,8 @@ int main(){
     if (choice == 1) player = new Jess();
     else if (choice == 2) player = new Bob();
     else if (choice == 3) player = new Donut();
+    else if (choice == 4) player = new Jena();
+    else if (choice == 5) player = new Rylee();
     else {
         cout << "Invalid choice.\n";
         return 0;
@@ -212,7 +240,6 @@ int main(){
         cout << "4. Add Potion\n";
         cout << "5. Add Hot Potato\n";
         cout << "6. Quit\n";
-        //cout << "7. Quit\n";
         cout << "Choice: ";
 
         int action;
