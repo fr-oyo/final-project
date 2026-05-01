@@ -54,16 +54,14 @@ public:
         string guess;
         cin >> guess;
 
-        // ❌ Wrong guess = immediate punishment
         if (guess != hiddenSide) {
             cout << "Wrong direction! The Stalker strikes!\n";
-            player.damage(damage);
+            player.takeDamage(damage);
             return;
         }
 
         cout << "You found the Stalker! Combat begins!\n";
 
-        // ⚔️ Combat loop
         while (isAlive() && player.gethealth() > 0) {
 
             string action;
@@ -72,13 +70,12 @@ public:
 
             if (action == "attack") {
 
-                int roll = rand() % 100; // 0–99
+                int roll = rand() % 100;
 
-                // 70% hit chance
                 if (roll < 70) {
                     int playerDamage = player.total_damage_power();
 
-                    cout << "You hit the Stalker for " 
+                    cout << "You hit the Stalker for "
                          << playerDamage << " damage!\n";
 
                     takeDamage(playerDamage);
@@ -87,17 +84,15 @@ public:
                         cout << "\nCongrats! You beat the Stalker!\n";
                         return;
                     }
-
                 }
-                //30% miss chance → Stalker attacks
                 else {
                     cout << "You missed! The Stalker counterattacks!\n";
-                    player.damage(damage);
+                    player.takeDamage(damage);
                 }
-
-            } else {
+            }
+            else {
                 cout << "You hesitate... The Stalker attacks!\n";
-                player.damage(damage);
+                player.takeDamage(damage);
             }
         }
     }
@@ -111,7 +106,6 @@ public:
 
         cout << "\nA Goblin runs at you from the front!\n";
 
-        // ⚔️ Combat loop
         while (isAlive() && player.gethealth() > 0) {
 
             string action;
@@ -120,9 +114,8 @@ public:
 
             if (action == "attack") {
 
-                int roll = rand() % 100; // 0–99
+                int roll = rand() % 100;
 
-                // 🟢 80% chance to hit
                 if (roll < 80) {
                     int playerDamage = player.total_damage_power();
 
@@ -136,21 +129,21 @@ public:
                         return;
                     }
                 }
-                // 🔴 20% miss → Goblin attacks
                 else {
                     cout << "You missed!\n";
                     cout << "The Goblin throws a pot of soup at you!\n";
-                    player.damage(damage);
+                    player.takeDamage(damage);
                 }
 
             } else {
                 cout << "You hesitate!\n";
                 cout << "The Goblin throws a pot of chili at you!\n";
-                player.damage(damage);
+                player.takeDamage(damage);
             }
         }
     }
 };
+
 
 class Reese : public Enemy {
 public:
@@ -158,40 +151,24 @@ public:
 
     void encounter(Character &player) {
 
-        cout << "\nYou hear a loud buzzing noise...\n";
-        cout << "Reese is riding a scooter at full speed toward you!\n";
-        cout << "Type 'dodge' to try to avoid her: ";
+        cout << "\nReese is riding a scooter at full speed!\n";
+        cout << "Type 'dodge': ";
 
         string action;
         cin >> action;
 
-        // ❌ Didn't dodge properly
-        if (action != "dodge") {
-            cout << "You froze! Reese runs you over!\n";
+        int roll = rand() % 100;
 
-            int newHealth = player.gethealth() - 9;
-            player.sethealth(newHealth);
+        // fail dodge OR wrong input
+        if (action != "dodge" || roll >= 40) {
+
+            cout << "You get run over!\n";
+            player.takeDamage(9);
 
             cout << "You lost 9 HP!\n";
             return;
         }
 
-        int roll = rand() % 100;
-
-        // 🟢 40% dodge
-        if (roll < 40) {
-            cout << "You dodged just in time!\n";
-            cout << "Reese crashes into a wall and bursts into flames!\n";
-        }
-        // 🔴 60% fail → lose 9 HP
-        else {
-            cout << "You weren't fast enough!\n";
-            cout << "Reese runs you over at full speed!\n";
-
-            int newHealth = player.gethealth() - 9;
-            player.sethealth(newHealth);
-
-            cout << "You lost 9 HP!\n";
-        }
+        cout << "You dodged! Reese crashes and explodes!\n";
     }
 };
