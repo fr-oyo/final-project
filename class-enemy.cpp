@@ -102,3 +102,52 @@ public:
         }
     }
 };
+
+class Goblin : public Enemy {
+public:
+    Goblin() : Enemy("Goblin", 30, 5) {}
+
+    void encounter(Character &player) {
+
+        cout << "\nA Goblin runs at you from the front!\n";
+
+        // ⚔️ Combat loop
+        while (isAlive() && player.gethealth() > 0) {
+
+            string action;
+            cout << "\nType 'attack': ";
+            cin >> action;
+
+            if (action == "attack") {
+
+                int roll = rand() % 100; // 0–99
+
+                // 🟢 80% chance to hit
+                if (roll < 80) {
+                    int playerDamage = player.total_damage_power();
+
+                    cout << "You hit the Goblin for "
+                         << playerDamage << " damage!\n";
+
+                    takeDamage(playerDamage);
+
+                    if (!isAlive()) {
+                        cout << "\nYou defeated the Goblin!\n";
+                        return;
+                    }
+                }
+                // 🔴 20% miss → Goblin attacks
+                else {
+                    cout << "You missed!\n";
+                    cout << "The Goblin throws a pot of soup at you!\n";
+                    player.damage(damage);
+                }
+
+            } else {
+                cout << "You hesitate!\n";
+                cout << "The Goblin throws a pot of chili at you!\n";
+                player.damage(damage);
+            }
+        }
+    }
+};
