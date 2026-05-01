@@ -10,31 +10,22 @@ public:
 
     virtual ~Enemy() {}
 
-    string getName() const {
-        return name;
-    }
+    string getName() const { return name; }
 
-    int getHealth() const {
-        return health;
-    }
+    int getHealth() const { return health; }
 
-    bool isAlive() const {
-        return health > 0;
-    }
+    bool isAlive() const { return health > 0; }
 
-    void takeDamage(int dmg) {
+    void takeDamage(double dmg) {
         health -= dmg;
         if (health < 0) health = 0;
     }
 
-    int getDamage() const {
-        return damage;
-    }
+    int getDamage() const { return damage; }
 };
 
-
-#include <cstdlib>
 #include <iostream>
+#include <cstdlib>
 using namespace std;
 
 class Stalker : public Enemy {
@@ -49,19 +40,40 @@ public:
     void encounter(Character &player) {
 
         cout << "\nYou feel something watching you...\n";
-        cout << "Look left or right: ";
 
         string guess;
-        cin >> guess;
 
-        if (guess != hiddenSide) {
-            cout << "Wrong direction! The Stalker strikes!\n";
-            player.takeDamage(damage);
-            return;
+        // =========================
+        // 👁️ GUESS LOOP
+        // =========================
+        while (true) {
+
+            cout << "Look left or right: ";
+            cin >> guess;
+
+            if (guess != hiddenSide) {
+
+                cout << "Wrong direction! The Stalker strikes!\n";
+
+                int player_damage = damage;
+                player.takeDamage(player_damage);
+
+                cout << "You lost " << player_damage << " HP!\n";
+
+                // reroll position
+                hiddenSide = (rand() % 2 == 0) ? "left" : "right";
+
+                cout << "The Stalker moves... try again.\n";
+            }
+            else {
+                cout << "You found the Stalker! Combat begins!\n";
+                break;
+            }
         }
 
-        cout << "You found the Stalker! Combat begins!\n";
-
+        // =========================
+        // ⚔️ COMBAT LOOP
+        // =========================
         while (isAlive() && player.gethealth() > 0) {
 
             string action;
@@ -73,12 +85,13 @@ public:
                 int roll = rand() % 100;
 
                 if (roll < 70) {
-                    int playerDamage = player.total_damage_power();
+
+                    double player_damage = player.total_power();
 
                     cout << "You hit the Stalker for "
-                         << playerDamage << " damage!\n";
+                         << player_damage << " damage!\n";
 
-                    takeDamage(playerDamage);
+                    takeDamage(player_damage);
 
                     if (!isAlive()) {
                         cout << "\nCongrats! You beat the Stalker!\n";
@@ -87,12 +100,20 @@ public:
                 }
                 else {
                     cout << "You missed! The Stalker counterattacks!\n";
-                    player.takeDamage(damage);
+
+                    int player_damage = damage;
+                    player.takeDamage(player_damage);
+
+                    cout << "You lost " << player_damage << " HP!\n";
                 }
             }
             else {
                 cout << "You hesitate... The Stalker attacks!\n";
-                player.takeDamage(damage);
+
+                int player_damage = damage;
+                player.takeDamage(player_damage);
+
+                cout << "You lost " << player_damage << " HP!\n";
             }
         }
     }
@@ -117,12 +138,13 @@ public:
                 int roll = rand() % 100;
 
                 if (roll < 80) {
-                    int playerDamage = player.total_damage_power();
+
+                    double player_damage = player.total_power();
 
                     cout << "You hit the Goblin for "
-                         << playerDamage << " damage!\n";
+                         << player_damage << " damage!\n";
 
-                    takeDamage(playerDamage);
+                    takeDamage(player_damage);
 
                     if (!isAlive()) {
                         cout << "\nYou defeated the Goblin!\n";
@@ -132,18 +154,25 @@ public:
                 else {
                     cout << "You missed!\n";
                     cout << "The Goblin throws a pot of soup at you!\n";
-                    player.takeDamage(damage);
-                }
 
-            } else {
+                    int player_damage = damage;
+                    player.takeDamage(player_damage);
+
+                    cout << "You lost " << player_damage << " HP!\n";
+                }
+            }
+            else {
                 cout << "You hesitate!\n";
-                cout << "The Goblin throws a pot of chili at you!\n";
-                player.takeDamage(damage);
+                cout << "The Goblin throws soup at you!\n";
+
+                int player_damage = damage;
+                player.takeDamage(player_damage);
+
+                cout << "You lost " << player_damage << " HP!\n";
             }
         }
     }
 };
-
 
 class Reese : public Enemy {
 public:
@@ -159,13 +188,14 @@ public:
 
         int roll = rand() % 100;
 
-        // fail dodge OR wrong input
         if (action != "dodge" || roll >= 40) {
 
-            cout << "You get run over!\n";
-            player.takeDamage(9);
+            cout << "Too slow! You get run over!\n";
 
-            cout << "You lost 9 HP!\n";
+            int player_damage = 9;
+            player.takeDamage(player_damage);
+
+            cout << "You lost " << player_damage << " HP!\n";
             return;
         }
 
