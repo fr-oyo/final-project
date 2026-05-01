@@ -151,3 +151,47 @@ public:
         }
     }
 };
+
+class Reese : public Enemy {
+public:
+    Reese() : Enemy("Reese", 1, 9) {}
+
+    void encounter(Character &player) {
+
+        cout << "\nYou hear a loud buzzing noise...\n";
+        cout << "Reese is riding a scooter at full speed toward you!\n";
+        cout << "Type 'dodge' to try to avoid her: ";
+
+        string action;
+        cin >> action;
+
+        // ❌ Didn't dodge properly
+        if (action != "dodge") {
+            cout << "You froze! Reese runs you over!\n";
+
+            int newHealth = player.gethealth() - 9;
+            player.sethealth(newHealth);
+
+            cout << "You lost 9 HP!\n";
+            return;
+        }
+
+        int roll = rand() % 100;
+
+        // 🟢 40% dodge
+        if (roll < 40) {
+            cout << "You dodged just in time!\n";
+            cout << "Reese crashes into a wall and bursts into flames!\n";
+        }
+        // 🔴 60% fail → lose 9 HP
+        else {
+            cout << "You weren't fast enough!\n";
+            cout << "Reese runs you over at full speed!\n";
+
+            int newHealth = player.gethealth() - 9;
+            player.sethealth(newHealth);
+
+            cout << "You lost 9 HP!\n";
+        }
+    }
+};
